@@ -66,4 +66,28 @@ object Checker {
     val candidates = scored(dict, word).toList
     candidates sortBy { _._2 } map { _._1 }
   }
+
+  def test(dict: Map[String, Int], filename: String) {
+    import java.util.Date
+
+    val testData: Iterator[(String, Seq[String])] =
+      (Source fromFile filename getLines) filter (!_.startsWith("#")) map ( _ split """\s+""" ) map ( words => (words.head, words.tail) )
+
+    val start = new Date
+    var total, right, incorrect = 0
+
+    testData.foreach { 
+      case (word, errors) =>
+        errors.foreach { error =>
+          total += 1
+          if (correct(dict, error).headOption.getOrElse("") == word) 
+            right += 1
+          else
+            incorrect += 1
+        }
+    }
+
+    val end = new Date
+    println("%s total, %s correct, %s incorrect, %s%% accuracy; in %s ms".format(total, right, incorrect, 100d * right / total, end.getTime - start.getTime))
+  }
 }
